@@ -1,0 +1,125 @@
+-- Criação da tabela ENDEREÇO (entidade independente)
+USE app;
+CREATE TABLE ENDEREÇO (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Bairro VARCHAR(100) NOT NULL,
+    Cidade VARCHAR(50) NOT NULL,
+    Estado CHAR(2) NOT NULL,
+    CEP CHAR(9) NOT NULL,
+    Número VARCHAR(10) NOT NULL
+);
+
+-- Criação da tabela TIPO_RESÍDUO
+CREATE TABLE TIPO_RESÍDUO (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome_Resíduo VARCHAR(50) NOT NULL UNIQUE,
+    Potencial_Reciclagem DECIMAL(5,2) NOT NULL,
+    Pontos_por_Kg DECIMAL(10,2) NOT NULL
+);
+
+-- Criação da tabela MORADOR
+CREATE TABLE MORADOR (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(150) NOT NULL,
+    CPF CHAR(11) NOT NULL UNIQUE,
+    Tipo_Residência VARCHAR(20) NOT NULL CHECK (Tipo_Residência IN ('Casa', 'Condomínio Popular', 'Condomínio Alto Padrão')),
+    Status_Conta VARCHAR(20) DEFAULT 'Ativo',
+    Endereço_ID INT NOT NULL,
+    FOREIGN KEY (Endereço_ID) REFERENCES ENDEREÇO(ID)
+);
+
+-- Criação da tabela ESTAÇÃO
+CREATE TABLE ESTAÇÃO (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Status VARCHAR(20) NOT NULL DEFAULT 'Operante' CHECK (Status IN ('Operante', 'Manutenção', 'Inativo')),
+    Capacidade_Atual DECIMAL(10,2) DEFAULT 0,
+    Capacidade_Máxima DECIMAL(10,2) NOT NULL,
+    Endereço_ID INT NOT NULL,
+    FOREIGN KEY (Endereço_ID) REFERENCES ENDEREÇO(ID)
+);
+
+-- Criação da tabela ESTAÇÃO_TIPO_RESÍDUO (relação N:N entre ESTAÇÃO e TIPO_RESÍDUO)
+CREATE TABLE ESTAÇÃO_TIPO_RESÍDUO (
+    Estação_ID INT NOT NULL,
+    Tipo_Resíduo_ID INT NOT NULL,
+    PRIMARY KEY (Estação_ID, Tipo_Resíduo_ID),
+    FOREIGN KEY (Estação_ID) REFERENCES ESTAÇÃO(ID),
+    FOREIGN KEY (Tipo_Resíduo_ID) REFERENCES TIPO_RESÍDUO(ID)
+);
+
+-- Criação da tabela EMPRESA
+CREATE TABLE EMPRESA (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome_Empresa VARCHAR(150) NOT NULL,
+    CNPJ CHAR(14) NOT NULL UNIQUE,
+    Tipo_Parceria VARCHAR(50) NOT NULL,
+    Contato VARCHAR(100) NOT NULL,
+    Endereço_ID INT NOT NULL,
+    FOREIGN KEY (Endereço_ID) REFERENCES ENDEREÇO(ID)
+);
+
+-- Criação da tabela COLETOR
+CREATE TABLE COLETOR (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR(150) NOT NULL,
+    CPF_CNPJ VARCHAR(14) NOT NULL UNIQUE,
+    Capacidade_Kg DECIMAL(10,2) NOT NULL,
+    Empresa_ID INT NOT NULL,
+    FOREIGN KEY (Empresa_ID) REFERENCES EMPRESA(ID)
+);
+
+-- Criação da tabela BENEFÍCIO
+CREATE TABLE BENEFÍCIO (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Tipo_Desconto VARCHAR(50) NOT NULL,
+    Valor DECIMAL(10,2) NOT NULL,
+    Pontos_Necessários DECIMAL(10,2) NOT NULL,
+    Status_Benefício VARCHAR(20) DEFAULT 'Disponível'
+);
+
+-- Criação da tabela RESÍDUO
+CREATE TABLE RESÍDUO (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Data_Descarte DATE NOT NULL,
+    Peso DECIMAL(10,2) NOT NULL,
+    Pontos_Acumulados DECIMAL(10,2) NOT NULL,
+    Usuário_ID INT NOT NULL,
+    Estação_ID INT NOT NULL,
+    Tipo_Resíduo_ID INT NOT NULL,
+    FOREIGN KEY (Usuário_ID) REFERENCES MORADOR(ID),
+    FOREIGN KEY (Estação_ID) REFERENCES ESTAÇÃO(ID),
+    FOREIGN KEY (Tipo_Resíduo_ID) REFERENCES TIPO_RESÍDUO(ID)
+);
+
+-- Criação da tabela HISTÓRICO_DESCARTE
+CREATE TABLE HISTÓRICO_DESCARTE (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Data_Hora_Descarte TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Resíduo_ID INT NOT NULL UNIQUE,
+    Usuário_ID INT NOT NULL,
+    FOREIGN KEY (Resíduo_ID) REFERENCES RESÍDUO(ID),
+    FOREIGN KEY (Usuário_ID) REFERENCES MORADOR(ID)
+);
+
+-- Criação da tabela RESGATA_BENEFÍCIO (relação N:N)
+CREATE TABLE RESGATA_BENEFÍCIO (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Data_Resgate DATE NOT NULL,
+    Usuário_ID INT NOT NULL,
+    Benefício_ID INT NOT NULL,
+    FOREIGN KEY (Usuário_ID) REFERENCES MORADOR(ID),
+    FOREIGN KEY (Benefício_ID) REFERENCES BENEFÍCIO(ID)
+);
+
+-- Criação da tabela COLETA
+CREATE TABLE COLETA (
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    Data_Hora_Recolhimento TIMESTAMP NOT NULL,
+    Status_Coleta VARCHAR(20) DEFAULT 'Agendada',
+    Coletor_ID INT NOT NULL,
+    Empresa_ID INT NOT NULL,
+    Resíduo_ID INT,
+    FOREIGN KEY (Coletor_ID) REFERENCES COLETOR(ID),
+    FOREIGN KEY (Empresa_ID) REFERENCES EMPRESA(ID),
+    FOREIGN KEY (Resíduo_ID) REFERENCES RESÍDUO(ID)
+);
