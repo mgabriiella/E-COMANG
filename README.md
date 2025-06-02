@@ -21,7 +21,7 @@ Siga os passos abaixo para configurar e executar o projeto na sua máquina local
 
 Clone este repositório para sua máquina local usando:
 
-```bash
+
 git clone <url-do-repositorio>
 cd app
 ```
@@ -114,11 +114,11 @@ USE app;
 ```
 
 #### 5.4. Execute o Script DDL
-
+**
 Execute o script `DDL.sql` para criar as tabelas. Você pode copiar o conteúdo do `DDL.sql` e colar no seu cliente MySQL, ou executar o arquivo diretamente:
-
+**
 ```bash
-mysql -u seu_usuario_mysql -p app < DDL.sql
+mysql -u seu_usuario_mysql -p app < E-COMANG/src/migrations/DDL.sql
 ```
 
 Isso criará as seguintes tabelas:
@@ -139,7 +139,7 @@ Isso criará as seguintes tabelas:
 Execute o script `DML.sql` para inserir os dados iniciais nas tabelas:
 
 ```bash
-mysql -u seu_usuario_mysql -p app < DML.sql
+mysql -u seu_usuario_mysql -p app < E-COMANG/src/migrations/DML.sql****
 ```
 
 Isso preencherá as tabelas com dados iniciais (ex.: endereços, tipos de resíduos, moradores, etc.).
@@ -149,7 +149,7 @@ Isso preencherá as tabelas com dados iniciais (ex.: endereços, tipos de resíd
 O script `DQL.sql` contém consultas para relatórios. Você pode executá-lo para testar os dados:
 
 ```bash
-mysql -u seu_usuario_mysql -p app < DQL.sql
+mysql -u seu_usuario_mysql -p app < E-COMANG/src/migrations/DML.sql
 ```
 
 ### 6. Inicie a Aplicação
@@ -362,5 +362,4 @@ app/
 ├── package.json               # Dependências e scripts do projeto
 ├── DDL.sql                    # Script de criação do esquema do banco de dados
 ├── DML.sql                    # Script de dados iniciais do banco de dados
-└── DQL.sql                    # Script de consultas para relatórios
 ```
